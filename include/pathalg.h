@@ -90,11 +90,12 @@ class dijkstor:public algbase{
     		pre=pp;
 			pesize=edges.size();
 			W=WD+1;
-			vector<vector<vector<int>>>tnein(LY,vector<vector<int>>());
-			vector<vector<vector<int>>>tneie(LY,vector<vector<int>>());
-			neie=tneie;
-			nein=tnein;
+			//vector<vector<vector<int>>>tnein(LY,vector<vector<int>>());
+			//vector<vector<vector<int>>>tneie(LY,vector<vector<int>>());
+			//neie=tneie;
+			//nein=tnein;
 			cout<<"pnodesize is :"<<pnodesize<<endl;
+			cout<<"neie size is "<<neie.size()<<endl;
 			for(int k=0;k<LY;k++)
 			{
 				vector<vector<int>>tmpn(pnodesize,vector<int>());
@@ -108,9 +109,11 @@ class dijkstor:public algbase{
 						tmpe[s].push_back(esigns[k][i]);
 						tmpe[t].push_back(esigns[k][i]);
 					}
+				
 				neie.push_back(tmpe);
 				nein.push_back(tmpn);
 			}
+			cout<<neie[1].size()<<" "<<nein[1].size()<<endl;
         }
         virtual vector<int> routalg(int s,int t,int bw){
         		cout<<"in rout alg"<<endl;
@@ -128,17 +131,19 @@ class dijkstor:public algbase{
         				int t=stes[l].second;
         				que.push(s);
         	        	visited[s]=1;
-        	        	cout<<s<<" "<<t<<endl;
         				while(!que.empty()&&vflag)
         				{
         					int node=que.front();
         					que.pop();
         					for(int i=0;i<nein[k][node].size();i++)
         					{
+        						
+        						//cout<<nein[k][node][i]<<endl;
         						if(neie[k][node][i]>0)
         						{	
         							int to=nein[k][node][i];
-        							if(visited[to]==0){
+        							if(visited[to]==0)
+        							{
         								pre[to]=node;que.push(to);visited[to]=1;
         							}
         							else
@@ -164,10 +169,6 @@ class dijkstor:public algbase{
         			}
         				
         		}
-        			
-        			
-        			
- 
         		return vector<int>();
 	 	}
         

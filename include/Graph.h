@@ -117,9 +117,9 @@ class Graph
             set<pair<int,int>>has;
             while(count<=LY/2)
             {
-            	int s=rand()%(n);
+            	int s=rand()%n;
             	int t=s;
-            	while(t==s||has.find(make_pair(s,t))==has.end())
+            	while(t==s||has.find(make_pair(s,t))!=has.end())
             		t=rand()%n;
             	stpair.push_back(make_pair(s,t));
             	has.insert(make_pair(s,t));
@@ -127,7 +127,6 @@ class Graph
             }
             cout<<"stpair size is "<<stpair.size()<<endl;
             router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
-            //router2.init(make_pair(redges,esigns),erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             return make_pair(redges,esigns);
         };
 };
