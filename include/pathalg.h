@@ -19,12 +19,12 @@
 #define YE 1
 #define inf INT_MAX/2
 using namespace std;
-class pairless {
+/*class pairless {
     public:
         bool operator()(pair<int,int>&a,pair<int,int>&b){
             return a.second<b.second;
         }
-};
+};*/
 class algbase {
     protected:
         vector<int> getrout(int &s, int &t, vector<edge> &edges, vector<int> &pre) {
