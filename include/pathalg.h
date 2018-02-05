@@ -14,9 +14,9 @@
 #define BS 5
 #define WD 5
 #ifndef LY 
-	#define LY 5
+	#define LY 500
 #endif
-#define YE 2
+#define YE 200
 #define inf INT_MAX/2
 using namespace std;
 /*class pairless {
