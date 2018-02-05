@@ -70,12 +70,13 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 				st[count]=i;
 				if(esigns[k][neie[i][j]]==-1)
 					te[count]=i;
-				te[count]=neibn[i][j];
+				else
+					te[count]=neibn[i][j];
 				count++;
 			}
 	for(int i=0;i<nodenum*LY*YE;i++)
-		d[i]=INT_MAX/2;
-	/*for(int k=0;k<LY;k++)
+		d[i]=WD+1;
+	for(int k=0;k<LY;k++)
 	{
 		int boff=k*YE*nodenum;
 		for(int i=0;i<YE;i++)
@@ -84,44 +85,46 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 			for(int j=0;j<stpair.size();j++)
 				d[boff+soff+stpair[i].first]=0;
 		}
-	}*/
+	}
 	for(int i=0;i<10;i++)
 		cout<<d[i]<<endl;
-	//cudaMalloc((void**)&dev_st,2*LY*edges.size()*sizeof(int));
-	//cudaMalloc((void**)&dev_te,2*LYedges.size()*sizeof(int));
-	//cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
-	//cudaMemcpy(dev_te,te,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
-	//cudaMemcpy(dev_st,st,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
-	//cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
-	cout<<"get out"<<endl;
+	cudaMalloc((void**)&dev_st,2*LY*edges.size()*sizeof(int));
+	cudaMalloc((void**)&dev_te,2*LY*edges.size()*sizeof(int));
+	cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
+	cudaMemcpy(dev_te,te,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_st,st,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
 	cout<<nodenum<<endl;
 };
 parallelor::parallelor()
 {
-
 };
-__global__ void BFSfast(int *st,int *te,int *d,int round,int E,int N)
+
+__global__ void BFSfast(int *st,int *te,int *d,int round,int E,int N,int size)
 {
 	int i = threadIdx.x + blockIdx.x*blockDim.x;
-	int ye=i/(E*LY);
+	if(i>size)return;
 	int eid=(i%(E*LY));
+	int s=st[eid],t=te[eid];
+	int ye=i/(E*LY);
 	int ly=eid/E;
 	int off=ye*N+ly*N*YE;
-	int s=st[eid],t=te[eid];
 	if(d[s+off]==round-1&&d[t+off]>round)
 		d[t+off]=round;
 }
-vector<int> parallelor:: routalg(int s,int t,int bw)
+vector<int> parallelor::routalg(int s,int t,int bw)
 {
 	cout<<"blasting "<<endl;
 	int kk=1;
 	time_t start,end;
 	start=clock();
-	int size=edges.size()*LY*YE;
-	for(int i=0;i<=WD;i++)
-		BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,edges.size(),nodenum);
-	cudaMemcpy(d,dev_d,YE*LY*nodenum*sizeof(int),cudaMemcpyDeviceToHost);
-	
+	int size=2*edges.size()*LY*YE;
+	for(int i=1;i<=WD;i++)
+		{
+			
+			BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,2*edges.size(),nodenum,size);
+		}
+	cudaMemcpy(d,dev_d,nodenum*LY*YE*sizeof(int),cudaMemcpyDeviceToHost);
 	end=clock();
 	cout<<"GPU time is : "<<end-start<<endl;
 	cout<<"over!"<<endl;
