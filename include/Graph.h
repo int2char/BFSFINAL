@@ -117,7 +117,7 @@ class Graph
             vector<pair<int,int>> stpair;
             int count=0;
             set<pair<int,int>>has;
-            while(count<=YE)
+           /* while(count<=YE)
             {
             	int s=rand()%n;
             	int t=s;
@@ -126,7 +126,8 @@ class Graph
             	stpair.push_back(make_pair(s,t));
             	has.insert(make_pair(s,t));
             	count++;
-            }
+            }*/
+            stpair.push_back(make_pair(0,99));
             cout<<"stpair size is "<<stpair.size()<<endl;
             router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             router2.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));

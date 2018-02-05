@@ -46,7 +46,6 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 	mark=new int;
 	*mark=0;
 	W=WD+1;
-	int *d,*dev_d,*pred,*dev_pred;
 	st=new int[2*edges.size()*LY];
 	te=new int[2*edges.size()*LY];
 	d=new int[nodenum*LY*YE];
@@ -74,11 +73,9 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 				te[count]=neibn[i][j];
 				count++;
 			}
-	count=0;
 	for(int i=0;i<nodenum*LY*YE;i++)
 		d[i]=INT_MAX/2;
-	
-	for(int k=0;k<LY;k++)
+	/*for(int k=0;k<LY;k++)
 	{
 		int boff=k*YE*nodenum;
 		for(int i=0;i<YE;i++)
@@ -87,20 +84,23 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 			for(int j=0;j<stpair.size();j++)
 				d[boff+soff+stpair[i].first]=0;
 		}
-	}
-	cudaMalloc((void**)&dev_st,edges.size()*sizeof(int));
-	cudaMalloc((void**)&dev_te,edges.size()*sizeof(int));
-	cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
-	cudaMemcpy(dev_te,te,LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_st,st,LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
+	}*/
+	for(int i=0;i<10;i++)
+		cout<<d[i]<<endl;
+	//cudaMalloc((void**)&dev_st,2*LY*edges.size()*sizeof(int));
+	//cudaMalloc((void**)&dev_te,2*LYedges.size()*sizeof(int));
+	//cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
+	//cudaMemcpy(dev_te,te,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
+	//cudaMemcpy(dev_st,st,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
+	//cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
 	cout<<"get out"<<endl;
+	cout<<nodenum<<endl;
 };
 parallelor::parallelor()
 {
 
 };
-__global__ void BFSfast(int *st,int *te,int *d,int*esign,int round,int E,int N)
+__global__ void BFSfast(int *st,int *te,int *d,int round,int E,int N)
 {
 	int i = threadIdx.x + blockIdx.x*blockDim.x;
 	int ye=i/(E*LY);
@@ -115,11 +115,13 @@ vector<int> parallelor:: routalg(int s,int t,int bw)
 {
 	cout<<"blasting "<<endl;
 	int kk=1;
-	int size=edges.size()*LY*YE;  
 	time_t start,end;
 	start=clock();
+	int size=edges.size()*LY*YE;
 	for(int i=0;i<=WD;i++)
-		BFSfast<<<size/512+1,512>>>(st,te,d,esignes,i,edges.size(),nodenum);
+		BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,edges.size(),nodenum);
+	cudaMemcpy(d,dev_d,YE*LY*nodenum*sizeof(int),cudaMemcpyDeviceToHost);
+	
 	end=clock();
 	cout<<"GPU time is : "<<end-start<<endl;
 	cout<<"over!"<<endl;

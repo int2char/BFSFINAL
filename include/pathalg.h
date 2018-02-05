@@ -14,9 +14,9 @@
 #define BS 5
 #define WD 5
 #ifndef LY 
-	#define LY 50
+	#define LY 10000
 #endif
-#define YE 50
+#define YE 1
 #define inf INT_MAX/2
 using namespace std;
 class pairless {
@@ -176,40 +176,6 @@ class dijkstor:public algbase{
         		cout<<"cpu time is: "<<end-start<<endl;
         		return vector<int>();
 	 	}
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
         static bool compare(pair<int,int>&a,pair<int,int>&b)
         {
         	if(a.second<b.second)
