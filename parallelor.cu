@@ -90,6 +90,10 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 	cudaMalloc((void**)&dev_st,2*LY*edges.size()*sizeof(int));
 	cudaMalloc((void**)&dev_te,2*LY*edges.size()*sizeof(int));
 	cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
+	if(dev_d==NULL) {
+		printf("couldn't allocate %d int's.\n");
+	}
+	cuMemGetInfo()
 	cudaMemcpy(dev_te,te,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_st,st,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
@@ -108,8 +112,8 @@ __global__ void BFSfast(int *st,int *te,int *d,int round,int E,int N,int size)
 	int ye=i/(E*LY);
 	int ly=eid/E;
 	int off=ye*N+ly*N*YE;
-	if(d[s+off]==round-1&&d[t+off]>round)
-		d[t+off]=round;
+	//if(d[s+off]==round-1&&d[t+off]>round)
+	d[t+off]=1;//round;
 }
 vector<vector<int>> parallelor::routalg(int s,int t,int bw)
 {
@@ -121,13 +125,15 @@ vector<vector<int>> parallelor::routalg(int s,int t,int bw)
 	for(int i=1;i<=WD;i++)
 		BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,2*edges.size(),nodenum,size);
 	cudaMemcpy(d,dev_d,nodenum*LY*YE*sizeof(int),cudaMemcpyDeviceToHost);
+	cudaStreamSynchronize(0);
+	for(int i=0;i<nodenum*LY*YE;i++)
+		if(d[i]!=6&&d[i]!=0)
+			cout<<i<<" "<<d[i]<<endl;
+	
 	end=clock();
 	cout<<"GPU time is : "<<end-start<<endl;
 	cout<<"over!"<<endl;
 	vector<vector<int>>result(LY,vector<int>());
-	/*for(int i=0;i<LY*nodenum*YE;i++)
-		cout<<d[i]<<" ";
-	cout<<endl;*/
 	for(int k=0;k<LY;k++)
 	{
 		int woff=k*YE*nodenum;
@@ -136,6 +142,9 @@ vector<vector<int>> parallelor::routalg(int s,int t,int bw)
 			result[k].push_back(d[woff+i*nodenum+stp[i].second]);
 		}
 	}
+	cudaFree(dev_te);
+	cudaFree(dev_st);
+	cudaFree(dev_d);
 	cout<<"before return"<<endl;
 	return result;
 };

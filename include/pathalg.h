@@ -16,7 +16,7 @@
 #ifndef LY 
 	#define LY 500
 #endif
-#define YE 200
+#define YE 100
 #define inf INT_MAX/2
 using namespace std;
 /*class pairless {
@@ -119,7 +119,7 @@ class dijkstor:public algbase{
         		vector<vector<int>>result(LY,vector<int>());
         		for(int k=0;k<LY;k++)
         		{
-        			cout<<stes.size()<<endl;
+        			//cout<<stes.size()<<endl;
         			for(int l=0;l<stes.size();l++)
         			{
                 		int tnode=-1;
@@ -160,12 +160,12 @@ class dijkstor:public algbase{
 							int prn=tnode;
 							while(prn!=s)
 							{
-								cout<<prn<<" ";
+								//cout<<prn<<" ";
 								prn=pre[prn];
 							}
-							cout<<prn<<" ";
+							//cout<<prn<<" ";
 						}
-						cout<<endl;
+						//cout<<endl;
 						result[k].push_back(tv);
         			}
         				

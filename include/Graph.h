@@ -45,36 +45,24 @@ class Graph
         pair<int,int>routalg(int s,int t,int bw)
 		{
         	
-        	vector<vector<int>>a=router1.routalg(0,0,0);
+        	//vector<vector<int>>a=router1.routalg(0,0,0);
 			vector<vector<int>>b=router2.routalg(0,0,0);
-			for(int i=0;i<a.size();i++)
+			int flag=0;
+			/*for(int i=0;i<a.size();i++)
 				for(int j=0;j<b[i].size();j++)
 				{
-					//cout<<a[i].size()<<" "<<b[i].size()<<endl;
 					if(b[i][j]!=a[i][j])
-						cout<<"erro!"<<a[i][j]<<" "<<b[i][j]<<endl;
-				}
+						if(flag==0)
+							{
+								cout<<i<<" "<<j<<endl;
+								flag=1;
+							}
+								//cout<<"erro!"<<a[i][j]<<" "<<b[i][j]<<endl;
+				}*/
 			return make_pair(0,0);
 		}
         int optimize(vector<vector<int>>&a)
         {
-        	/*vector<fedge>edges;
-        	vector<nodenum,vector<int>()>nine;
-        	int cc=0;
-        	for(int i=0;i<a.size();a++)
-        	{
-        		for(int j=0;j<a[i].size();j++)
-        			{
-        				if(a[i][j]<=WD)
-        				{	
-        					nine[i].push_back(cc);
-        					edges.push_back(fedge(i,j,a[i][j],1));
-        					edges.push_back(fedge(i,j,-a[i][j],))
-        				}
-        				cc++;
-        			}
-        	}*/
-        	
         }
         virtual ~Graph(){};
     protected:
@@ -158,7 +146,7 @@ class Graph
             //stpair.push_back(make_pair(3,6));
             //stpair.push_back(make_pair(0,6));
             cout<<"stpair size is "<<stpair.size()<<endl;
-            router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
+           // router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             router2.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             return make_pair(redges,esigns);
         };
