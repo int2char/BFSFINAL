@@ -3,70 +3,12 @@
 #include <cuda.h>
 #include"pathalg.h"
 static const int WORK_SIZE =258;
-__global__ void BFShigh(int t,int *m,int *st,int *te,int *d,int *chan,int round,int edgesize,int nodenum)
-{
-	int i = threadIdx.x + blockIdx.x*blockDim.x;
-	if(i>=edgesize)return;
-	int from=st[i];
-	if (chan[from]<0)return;
-	chan[from]=-1;
-	int to=te[i];
-	d[to]=round;
-	if((to%nodenum)/(WD+1)==t)*m=1;
-}
-__global__ void initchan(int s,int *chan,int *d,int *pred,int nodenum)
-{
-	int i = threadIdx.x + blockIdx.x*blockDim.x;
-	if(i>=nodenum*LY)return;
-	int bi=i%nodenum;
-	int W=WD+1;
-	chan[i]=(bi/W==s)?1:-1;
-	d[i]=(bi/W==s)?0:inf;
-	pred[i]=d[i];
-}
-__global__ void chanchan(int *m,int *pred,int *d,int *chan,int nodenum)
-{
-	int i = threadIdx.x + blockIdx.x*blockDim.x;
-	if(i>=nodenum*LY)return;
-	chan[i]=-1;
-	if(d[i]<pred[i])
-	{
-		chan[i]=1;
-		pred[i]=d[i];
-	}
-}
 void parallelor::copydata(int s,vector<edge>&edges,int nodenum){
-	memset(pre,-1,sizeof(int)*nodenum);
-	*m=0;
-	for(int i=0;i<nodenum;i++)
-		d[i]=INT_MAX/2;
-	d[s]=0;
-	for(int i=0;i<edges.size();i++)
-		aedges[i]=edges[i];
-	cudaMemcpy(dev_edges,aedges,edges.size()* sizeof(edge),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_m,m,sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_d,d,sizeof(int)*nodenum,cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_pre,pre,sizeof(int)*nodenum,cudaMemcpyHostToDevice);
+	
 };
 void parallelor::dellocate(){
-	/*delete[]d;
-	delete[]pre;
-	delete[]aedges;
-	delete m;
-	cudaFree(dev_edges);
-	cudaFree(dev_m);
-	cudaFree(dev_d);
-	cudaFree(dev_pre);*/
 };
 void parallelor::allocate(int maxn,int maxedge){
-	m=new int;
-	d=new int[maxn],pre=new int[maxn];
-	aedges=new edge[maxedge];
-	cudaMalloc(&dev_edges, sizeof(edge)*maxedge);
-	cudaMalloc((void**)&dev_d,maxn*sizeof(int));
-	cudaMalloc((void**)&dev_pre,maxn*sizeof(int));
-	cudaMemcpy(duan,dev_duan,duansize*sizeof(int),cudaMemcpyDeviceToHost);
-	cudaMalloc((void**)&dev_m,sizeof(int));
 }
 void parallelor::topsort()
 {
@@ -97,7 +39,7 @@ void parallelor::topsort()
 void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,int>>stpair,vector<vector<int>>&relate,ginfo ginf)
 {
 	cout<<"in cuda init"<<endl;
-	nodenum=ginf.enodesize;
+	nodenum=ginf.pnodesize;
 	edges=ext.first;
 	vector<vector<int>>esigns;
 	esigns=ext.second;
@@ -105,89 +47,82 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 	*mark=0;
 	W=WD+1;
 	int *d,*dev_d,*pred,*dev_pred;
-	st=new int[2*WD*edges.size()*LY];
-	te=new int[2*WD*edges.size()*LY];
-	chan=new int[nodenum*LY];
-	d=new int[nodenum*LY];
-	pred=new int[nodenum*LY];
+	st=new int[2*edges.size()*LY];
+	te=new int[2*edges.size()*LY];
+	d=new int[nodenum*LY*YE];
+	esignes=new int[edges.size()*LY];
 	vector<vector<int>>nein(nodenum*LY,vector<int>());
-	vector<int>as(nodenum*LY,0);
-	ancestor=as;
 	neibn=nein;
-	cout<<"gsdfs"<<endl;
+	vector<vector<int>>neie(nodenum,vector<int>());
+	for(int i=0;i<edges.size();i++)
+		{
+			int s=edges[i].s;
+			int t=edges[i].t;
+			neibn[s].push_back(t);
+			neibn[t].push_back(s);
+			neie[s].push_back(i);
+			neie[t].push_back(i);
+		}
+	int count=0;
+	for(int k=0;k<LY;k++)
+		for(int i=0;i<nodenum;i++)
+			for(int j=0;j<neibn[i].size();j++)
+			{
+				st[count]=i;
+				if(esigns[k][neie[i][j]]==-1)
+					te[count]=i;
+				te[count]=neibn[i][j];
+				count++;
+			}
+	count=0;
+	for(int i=0;i<nodenum*LY*YE;i++)
+		d[i]=INT_MAX/2;
+	
 	for(int k=0;k<LY;k++)
 	{
-		int startn=k*nodenum;
-		for(int i=0;i<edges.size();i++)
-			for(int j=0;j<W-1;j++)
-			{
-				int s=edges[i].s*W+j+startn;
-				int t=edges[i].t*W+j+1+startn;
-				ancestor[t]++;
-				neibn[s].push_back(t);
-				neibn[t].push_back(s);
-			}
-	}
-	cout<<"before sort "<<endl;
-	topsort();
-	int count=0;
-	cout<<"sort out "<<endl;
-	for(int i=0;i<nodenum*LY;i++)
-		for(int j=0;j<neibn[ordernode[i]].size();j++)
+		int boff=k*YE*nodenum;
+		for(int i=0;i<YE;i++)
 		{
-			st[count]=ordernode[i];
-			te[count]=neibn[ordernode[i]][j];
-			count++;
+			int soff=i*nodenum;
+			for(int j=0;j<stpair.size();j++)
+				d[boff+soff+stpair[i].first]=0;
 		}
-	cout<<"asdasd"<<endl;
-	for(int i=0;i<nodenum*LY;i++)
-	{
-		chan[i]=-1;
-		d[i]=INT_MAX/2;
-		pred[i]=d[i];
 	}
-	cout<<"hrerr"<<endl;
-	cudaMalloc((void**)&dev_chan,nodenum*LY*sizeof(int));
-	cudaMalloc((void**)&dev_st,LY*WD*edges.size()*sizeof(int));
-	cudaMalloc((void**)&dev_te,LY*WD*edges.size()*sizeof(int));
-	cudaMalloc((void**)&dev_d,LY*nodenum*sizeof(int));
-	cudaMalloc((void**)&dev_pred,LY*nodenum*sizeof(int));
-	cudaMalloc((void**)&dev_mark,sizeof(int));
-	cudaMemcpy(dev_chan,chan,nodenum*LY*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_te,te,LY*WD*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_st,st,LY*WD*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_d,d,LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_pred,pred,LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
-	cudaMemcpy(dev_mark,mark,sizeof(int),cudaMemcpyHostToDevice);
+	cudaMalloc((void**)&dev_st,edges.size()*sizeof(int));
+	cudaMalloc((void**)&dev_te,edges.size()*sizeof(int));
+	cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
+	cudaMemcpy(dev_te,te,LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_st,st,LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
+	cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
 	cout<<"get out"<<endl;
 };
 parallelor::parallelor()
 {
 
 };
+__global__ void BFSfast(int *st,int *te,int *d,int*esign,int round,int E,int N)
+{
+	int i = threadIdx.x + blockIdx.x*blockDim.x;
+	int ye=i/(E*LY);
+	int eid=(i%(E*LY));
+	int ly=eid/E;
+	int off=ye*N+ly*N*YE;
+	int s=st[eid],t=te[eid];
+	if(d[s+off]==round-1&&d[t+off]>round)
+		d[t+off]=round;
+}
 vector<int> parallelor:: routalg(int s,int t,int bw)
 {
 	cout<<"blasting "<<endl;
-	int E=2*edges.size()*WD*LY;
 	int kk=1;
-	for(int i=0;i<1;i++)
-	{
-		*mark=0;
-		initchan<< <(nodenum*LY/WORK_SIZE)+1, WORK_SIZE >> >(s,dev_chan,dev_d,dev_pred,nodenum);
-		cudaMemcpy(dev_m,&mark, sizeof(int), cudaMemcpyHostToDevice);
-		do{
-			cudaMemcpy(chan,dev_chan,nodenum*sizeof(int), cudaMemcpyDeviceToHost);
-			int cc=0;
-			BFShigh << <(E/WORK_SIZE)+1, WORK_SIZE >> >(t,dev_m,dev_st,dev_te,dev_d,dev_chan,kk,E,nodenum);
-			chanchan<< <(nodenum*LY/WORK_SIZE)+1, WORK_SIZE >> >(dev_m,dev_pred,dev_d,dev_chan,nodenum);
-			cudaMemcpy(mark, dev_m, sizeof(int), cudaMemcpyDeviceToHost);
-			kk++;
-		}
-		while(*mark==0);
-		cout<<"out here is !"<<endl;
-		//cout<<"kk is: "<<kk<<endl;
-	}
-	cout<<"out routalg"<<endl;
+	int size=edges.size()*LY*YE;  
+	time_t start,end;
+	start=clock();
+	for(int i=0;i<=WD;i++)
+		BFSfast<<<size/512+1,512>>>(st,te,d,esignes,i,edges.size(),nodenum);
+	end=clock();
+	cout<<"GPU time is : "<<end-start<<endl;
+	cout<<"over!"<<endl;
 	return vector<int>();
 };
 int fls(int x)

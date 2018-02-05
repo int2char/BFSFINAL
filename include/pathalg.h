@@ -16,6 +16,7 @@
 #ifndef LY 
 	#define LY 50
 #endif
+#define YE 50
 #define inf INT_MAX/2
 using namespace std;
 class pairless {
@@ -117,11 +118,13 @@ class dijkstor:public algbase{
         }
         virtual vector<int> routalg(int s,int t,int bw){
         		cout<<"in rout alg"<<endl;
+        		time_t start,end;
+        		start=clock();
         		for(int k=0;k<LY;k++)
         		{
         			for(int l=0;l<stes.size();l++)
         			{
-            			cout<<k<<" "<<l<<":"<<endl;
+            			//cout<<k<<" "<<l<<":"<<endl;
                 		int tnode=-1;
         				vector<int>visited(pnodesize,0);
         				vector<int>pre(pnodesize,-1);
@@ -154,21 +157,23 @@ class dijkstor:public algbase{
         				}
         				int prn=tnode;
 						int len=0;
-						cout<<tnode<<" ";
+						//cout<<tnode<<" ";
 						if(tnode>=0)
 						{
 							int prn=tnode;
 							while(prn!=s)
 							{
-								cout<<prn<<" ";
+								//cout<<prn<<" ";
 								prn=pre[prn];
 							}
-							cout<<prn<<" ";
+							//cout<<prn<<" ";
 						}
-						cout<<endl;
+						//cout<<endl;
         			}
         				
         		}
+        		end=clock();
+        		cout<<"cpu time is: "<<end-start<<endl;
         		return vector<int>();
 	 	}
         
@@ -244,6 +249,7 @@ class parallelor:public algbase
 		int W;
 		int *st,*te,*dev_st,*dev_te;
 		int *chan,*dev_chan;
+		int*esignes;
 		vector<vector<int>>neibn;
 		int *mark,*dev_mark;
 	public:

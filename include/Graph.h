@@ -35,11 +35,13 @@ class Graph
         pair<int,int>prepush(int s,int t,int n,ofstream& out)
         {
         	pair<int,int>a=router1.prepush(s,t,0);
-        	return make_pair(a.first,a.second);
+        	pair<int,int>b=router2.prepush(s,t,0);
+        	return make_pair(0,0);
         }
         pair<int,int>routalg(int s,int t,int bw)
 		{
-			router1.routalg(0,0,0);
+        	router1.routalg(0,0,0);
+			router2.routalg(0,0,0);
 			return make_pair(0,0);
 		}
         virtual ~Graph(){};
@@ -115,7 +117,7 @@ class Graph
             vector<pair<int,int>> stpair;
             int count=0;
             set<pair<int,int>>has;
-            while(count<=LY/2)
+            while(count<=YE)
             {
             	int s=rand()%n;
             	int t=s;
@@ -127,6 +129,7 @@ class Graph
             }
             cout<<"stpair size is "<<stpair.size()<<endl;
             router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
+            router2.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             return make_pair(redges,esigns);
         };
 };
@@ -142,7 +145,7 @@ private:
     virtual void GenGraph(){
         int count = 0;
         set<pair<int, int>>flag;
-        double threhod = 10*n/((n-1));
+        double threhod = 6*n/((n-1));
         for (int i = 0; i <n; i++)
             for (int j =i+1; j<n;j++)
                 if (i != j)
