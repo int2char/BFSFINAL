@@ -38,11 +38,12 @@ void parallelor::topsort()
 };
 void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,int>>stpair,vector<vector<int>>&relate,ginfo ginf)
 {
-	cout<<"in cuda init"<<endl;
+	//cout<<"in cuda init"<<endl;
 	nodenum=ginf.pnodesize;
 	edges=ext.first;
 	vector<vector<int>>esigns;
 	esigns=ext.second;
+	stp=stpair;
 	mark=new int;
 	*mark=0;
 	W=WD+1;
@@ -86,8 +87,6 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 				d[boff+soff+stpair[i].first]=0;
 		}
 	}
-	for(int i=0;i<10;i++)
-		cout<<d[i]<<endl;
 	cudaMalloc((void**)&dev_st,2*LY*edges.size()*sizeof(int));
 	cudaMalloc((void**)&dev_te,2*LY*edges.size()*sizeof(int));
 	cudaMalloc((void**)&dev_d,YE*LY*nodenum*sizeof(int));
@@ -112,7 +111,7 @@ __global__ void BFSfast(int *st,int *te,int *d,int round,int E,int N,int size)
 	if(d[s+off]==round-1&&d[t+off]>round)
 		d[t+off]=round;
 }
-vector<int> parallelor::routalg(int s,int t,int bw)
+vector<vector<int>> parallelor::routalg(int s,int t,int bw)
 {
 	cout<<"blasting "<<endl;
 	int kk=1;
@@ -120,15 +119,25 @@ vector<int> parallelor::routalg(int s,int t,int bw)
 	start=clock();
 	int size=2*edges.size()*LY*YE;
 	for(int i=1;i<=WD;i++)
-		{
-			
-			BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,2*edges.size(),nodenum,size);
-		}
+		BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,2*edges.size(),nodenum,size);
 	cudaMemcpy(d,dev_d,nodenum*LY*YE*sizeof(int),cudaMemcpyDeviceToHost);
 	end=clock();
 	cout<<"GPU time is : "<<end-start<<endl;
 	cout<<"over!"<<endl;
-	return vector<int>();
+	vector<vector<int>>result(LY,vector<int>());
+	/*for(int i=0;i<LY*nodenum*YE;i++)
+		cout<<d[i]<<" ";
+	cout<<endl;*/
+	for(int k=0;k<LY;k++)
+	{
+		int woff=k*YE*nodenum;
+		for(int i=0;i<YE;i++)
+		{
+			result[k].push_back(d[woff+i*nodenum+stp[i].second]);
+		}
+	}
+	cout<<"before return"<<endl;
+	return result;
 };
 int fls(int x)
 {

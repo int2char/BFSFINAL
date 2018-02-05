@@ -14,7 +14,7 @@
 #define BS 5
 #define WD 5
 #ifndef LY 
-	#define LY 20
+	#define LY 5
 #endif
 #define YE 2
 #define inf INT_MAX/2
@@ -41,7 +41,7 @@ class algbase {
         algbase(){};
         virtual bool cutcake(int)=0;
         virtual void init(pair<vector<edge>,vector<vector<int>>>extenedges,vector<pair<int,int>>stpair,vector<vector<int>>&relate,ginfo)=0;
-	 	virtual vector<int> routalg(int s,int t,int bw)=0;
+	 	virtual vector<vector<int>> routalg(int s,int t,int bw)=0;
 	 	virtual pair<int,int> prepush(int s,int t,int bw)=0;
 };
 class dijkstor:public algbase{
@@ -69,7 +69,6 @@ class dijkstor:public algbase{
         virtual bool cutcake(int index){
         }
         virtual void init(pair<vector<edge>,vector<vector<int>>>extenedges,vector<pair<int,int>>stpair,vector<vector<int>>&relate,ginfo ginf){
-        	cout<<"init in pa"<<endl;
         	maxbw=500;
         	rela=relate;
         	stes=stpair;
@@ -95,8 +94,6 @@ class dijkstor:public algbase{
 			//vector<vector<vector<int>>>tneie(LY,vector<vector<int>>());
 			//neie=tneie;
 			//nein=tnein;
-			cout<<"pnodesize is :"<<pnodesize<<endl;
-			cout<<"neie size is "<<neie.size()<<endl;
 			for(int k=0;k<LY;k++)
 			{
 				vector<vector<int>>tmpn(pnodesize,vector<int>());
@@ -114,28 +111,32 @@ class dijkstor:public algbase{
 				neie.push_back(tmpe);
 				nein.push_back(tmpn);
 			}
-			cout<<neie[1].size()<<" "<<nein[1].size()<<endl;
         }
-        virtual vector<int> routalg(int s,int t,int bw){
+        virtual vector<vector<int>> routalg(int s,int t,int bw){
         		cout<<"in rout alg"<<endl;
         		time_t start,end;
         		start=clock();
+        		vector<vector<int>>result(LY,vector<int>());
         		for(int k=0;k<LY;k++)
         		{
+        			cout<<stes.size()<<endl;
         			for(int l=0;l<stes.size();l++)
         			{
                 		int tnode=-1;
+                		int tv=WD+1;
         				vector<int>visited(pnodesize,0);
         				vector<int>pre(pnodesize,-1);
         				int vflag=1;
-        				queue<int>que;
+        				queue<pair<int,int>>que;
         				int s=stes[l].first;
         				int t=stes[l].second;
-        				que.push(s);
+        				que.push(make_pair(s,0));
         	        	visited[s]=1;
         				while(!que.empty()&&vflag)
         				{
-        					int node=que.front();
+        					int node=que.front().first;
+        					int v=que.front().second;
+        					if(v>=WD)break;
         					que.pop();
         					for(int i=0;i<nein[k][node].size();i++)
         					{
@@ -144,34 +145,41 @@ class dijkstor:public algbase{
         							int to=nein[k][node][i];
         							if(visited[to]==0)
         							{
-        								pre[to]=node;que.push(to);visited[to]=1;
+        								pre[to]=node;que.push(make_pair(to,v+1));visited[to]=1;
         							}
         							else
         								continue;
-        							if(to==t){tnode=to;vflag=0;break;}
+        							if(to==t){tnode=to;tv=v+1;vflag=0;break;}
         						}
         					}
         				}
         				int prn=tnode;
 						int len=0;
-						//cout<<tnode<<" ";
 						if(tnode>=0)
 						{
 							int prn=tnode;
 							while(prn!=s)
 							{
-								//cout<<prn<<" ";
+								cout<<prn<<" ";
 								prn=pre[prn];
 							}
-							//cout<<prn<<" ";
+							cout<<prn<<" ";
 						}
-						//cout<<endl;
+						cout<<endl;
+						result[k].push_back(tv);
         			}
         				
         		}
         		end=clock();
+        		/*for(int i=0;i<LY;i++)
+        			{
+        				cout<<i<<":";
+        				for(int j=0;j<YE;j++)
+        					cout<<result[i][j]<<" ";
+        				cout<<endl;
+        			}*/
         		cout<<"cpu time is: "<<end-start<<endl;
-        		return vector<int>();
+        		return result;
 	 	}
         static bool compare(pair<int,int>&a,pair<int,int>&b)
         {
@@ -215,12 +223,13 @@ class parallelor:public algbase
 		int*esignes;
 		vector<vector<int>>neibn;
 		int *mark,*dev_mark;
+		vector<pair<int,int>>stp;
 	public:
 	 	 parallelor();
 	 	 void topsort();
 	 	 virtual pair<int,int> prepush(int s,int t,int bw){};
 	 	 virtual bool cutcake(int index){};
-	 	 virtual vector<int> routalg(int s,int t,int bw);
+	 	 virtual vector<vector<int>> routalg(int s,int t,int bw);
 	 	 virtual ~parallelor(){dellocate();}
 	 	 virtual void init(pair<vector<edge>,vector<vector<int>>>extenedges,vector<pair<int,int>>stpair,vector<vector<int>>&relate,ginfo ginf);
 };

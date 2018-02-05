@@ -20,6 +20,10 @@ struct Edge {
     double unit_price;
     Edge(int f, int t, int b, double up) : from(f), to(t), bandwith(b), unit_price(up) {};
 };
+struct fedge{
+	int from,to,price,cap;
+	fedge(int f,int t,int p,int c):from(f),to(t),price(p),cap(c){};
+};
 class Graph
 {
     public:
@@ -40,10 +44,38 @@ class Graph
         }
         pair<int,int>routalg(int s,int t,int bw)
 		{
-        	router1.routalg(0,0,0);
-			router2.routalg(0,0,0);
+        	
+        	vector<vector<int>>a=router1.routalg(0,0,0);
+			vector<vector<int>>b=router2.routalg(0,0,0);
+			for(int i=0;i<a.size();i++)
+				for(int j=0;j<b[i].size();j++)
+				{
+					//cout<<a[i].size()<<" "<<b[i].size()<<endl;
+					if(b[i][j]!=a[i][j])
+						cout<<"erro!"<<a[i][j]<<" "<<b[i][j]<<endl;
+				}
 			return make_pair(0,0);
 		}
+        int optimize(vector<vector<int>>&a)
+        {
+        	/*vector<fedge>edges;
+        	vector<nodenum,vector<int>()>nine;
+        	int cc=0;
+        	for(int i=0;i<a.size();a++)
+        	{
+        		for(int j=0;j<a[i].size();j++)
+        			{
+        				if(a[i][j]<=WD)
+        				{	
+        					nine[i].push_back(cc);
+        					edges.push_back(fedge(i,j,a[i][j],1));
+        					edges.push_back(fedge(i,j,-a[i][j],))
+        				}
+        				cc++;
+        			}
+        	}*/
+        	
+        }
         virtual ~Graph(){};
     protected:
         void addedge(int _s,int _t,int _w,double _bw=500){
@@ -117,18 +149,14 @@ class Graph
             vector<pair<int,int>> stpair;
             int count=0;
             set<pair<int,int>>has;
-            /*while(count<=YE)
+            for(int i=0;i<YE;i++)
             {
-            	int s=rand()%n;
-            	int t=s;
-            	while(t==s||has.find(make_pair(s,t))!=has.end())
-            		t=rand()%n;
-            	stpair.push_back(make_pair(s,t));
-            	has.insert(make_pair(s,t));
-            	count++;
-            }*/
-            stpair.push_back(make_pair(3,6));
-            stpair.push_back(make_pair(0,6));
+            	int t=i;
+            	while(t==i)t=rand()%n;
+            	stpair.push_back(make_pair(i,t));
+            }
+            //stpair.push_back(make_pair(3,6));
+            //stpair.push_back(make_pair(0,6));
             cout<<"stpair size is "<<stpair.size()<<endl;
             router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             router2.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
