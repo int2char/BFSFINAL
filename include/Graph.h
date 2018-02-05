@@ -109,7 +109,7 @@ class Graph
             	for(int j=0;j<edges.size();j++)
             	{
             		int ran=rand()%100;
-            		if(ran<40)
+            		if(ran<10)
             			esigns[i].push_back(-1);
             		else
             			esigns[i].push_back(1);
@@ -146,7 +146,7 @@ private:
     virtual void GenGraph(){
         int count = 0;
         set<pair<int, int>>flag;
-        double threhod = 6*n/((n-1));
+        double threhod = 10*n/((n-1));
         for (int i = 0; i <n; i++)
             for (int j =i+1; j<n;j++)
                 if (i != j)
