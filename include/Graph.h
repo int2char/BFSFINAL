@@ -45,7 +45,7 @@ class Graph
         pair<int,int>routalg(int s,int t,int bw)
 		{
         	
-        	//vector<vector<int>>a=router1.routalg(0,0,0);
+        	vector<vector<int>>a=router1.routalg(0,0,0);
 			vector<vector<int>>b=router2.routalg(0,0,0);
 			int flag=0;
 			/*for(int i=0;i<a.size();i++)
@@ -61,9 +61,49 @@ class Graph
 				}*/
 			return make_pair(0,0);
 		}
+        /*bool spfa(vector<fedge>&edges,vector<int>&neie,int nodenum,int s,int t)
+		{
+        	vector<int>dist(nodenum,INT_MAX);
+        	vector<int>pre(nodenum,-1);
+        	queue<int>que;
+        	dist[s]=0;
+        	que.push(s);
+        	while(!que.empty())
+        	{
+        		int node=que.top();
+        		que.pop();
+        		for(int i=0;i<neie[node].size();i++)
+        		{
+        			int eid=neie[node][i];
+        			fedge e=a[i];
+        			if(e.cap>0)
+        			{
+        				int to=e.to;
+        				if(dist[node]+e.price>dist[to])
+        				{
+        					dist[to]=dist[node]+e.price;
+        					que.push(to);
+        					pre[to]=a[i];
+        				}
+        			}
+        		}
+        	}
+        	if(pre[t]==-1)
+        		return -1;
+        	int  node=t;
+        	while(node!=s)
+        		{
+        			edges[pre[node]].cap=-1;
+        			edges[pre[node]^1].cap=1;
+        			node=edges[pre[node]].from;
+        		}
+        	return 1;
+		}
         int optimize(vector<vector<int>>&a)
         {
-        }
+        	
+        	
+        }*/
         virtual ~Graph(){};
     protected:
         void addedge(int _s,int _t,int _w,double _bw=500){
@@ -146,7 +186,7 @@ class Graph
             //stpair.push_back(make_pair(3,6));
             //stpair.push_back(make_pair(0,6));
             cout<<"stpair size is "<<stpair.size()<<endl;
-           // router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
+            router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             router2.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             return make_pair(redges,esigns);
         };

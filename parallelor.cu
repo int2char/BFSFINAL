@@ -93,7 +93,7 @@ void parallelor::init(pair<vector<edge>,vector<vector<int>>>ext,vector<pair<int,
 	if(dev_d==NULL) {
 		printf("couldn't allocate %d int's.\n");
 	}
-	cuMemGetInfo()
+	//cuMemGetInfo()
 	cudaMemcpy(dev_te,te,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_st,st,2*LY*edges.size()*sizeof(int),cudaMemcpyHostToDevice);
 	cudaMemcpy(dev_d,d,YE*LY*nodenum*sizeof(int),cudaMemcpyHostToDevice);
@@ -126,10 +126,6 @@ vector<vector<int>> parallelor::routalg(int s,int t,int bw)
 		BFSfast<<<size/512+1,512>>>(dev_st,dev_te,dev_d,i,2*edges.size(),nodenum,size);
 	cudaMemcpy(d,dev_d,nodenum*LY*YE*sizeof(int),cudaMemcpyDeviceToHost);
 	cudaStreamSynchronize(0);
-	for(int i=0;i<nodenum*LY*YE;i++)
-		if(d[i]!=6&&d[i]!=0)
-			cout<<i<<" "<<d[i]<<endl;
-	
 	end=clock();
 	cout<<"GPU time is : "<<end-start<<endl;
 	cout<<"over!"<<endl;

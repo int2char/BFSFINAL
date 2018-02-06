@@ -12,11 +12,11 @@
 #include<queue>
 #define ML 50
 #define BS 5
-#define WD 5
+#define WD 8
 #ifndef LY 
 	#define LY 500
 #endif
-#define YE 100
+#define YE 200
 #define inf INT_MAX/2
 using namespace std;
 /*class pairless {
@@ -72,6 +72,7 @@ class dijkstor:public algbase{
         	maxbw=500;
         	rela=relate;
         	stes=stpair;
+        	cout<<"in pathalg init "<<stes.size()<<endl;
         	edges=extenedges.first;
         	vector<vector<int>>esigns=extenedges.second;
         	edgesize=edges.size(),nodenum=ginf.enodesize,pesize=ginf.pesize,pnodesize=ginf.pnodesize;
@@ -90,10 +91,6 @@ class dijkstor:public algbase{
     		pre=pp;
 			pesize=edges.size();
 			W=WD+1;
-			//vector<vector<vector<int>>>tnein(LY,vector<vector<int>>());
-			//vector<vector<vector<int>>>tneie(LY,vector<vector<int>>());
-			//neie=tneie;
-			//nein=tnein;
 			for(int k=0;k<LY;k++)
 			{
 				vector<vector<int>>tmpn(pnodesize,vector<int>());
@@ -119,7 +116,6 @@ class dijkstor:public algbase{
         		vector<vector<int>>result(LY,vector<int>());
         		for(int k=0;k<LY;k++)
         		{
-        			//cout<<stes.size()<<endl;
         			for(int l=0;l<stes.size();l++)
         			{
                 		int tnode=-1;
