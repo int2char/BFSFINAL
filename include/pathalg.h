@@ -14,9 +14,9 @@
 #define BS 5
 #define WD 8
 #ifndef LY 
-	#define LY 500
+	#define LY 100
 #endif
-#define YE 200
+#define YE 100
 #define inf INT_MAX/2
 using namespace std;
 /*class pairless {
@@ -110,7 +110,69 @@ class dijkstor:public algbase{
 			}
         }
         virtual vector<vector<int>> routalg(int s,int t,int bw){
-        		cout<<"in rout alg"<<endl;
+        	cout<<"in rout alg"<<endl;
+			time_t start,end;
+			start=clock();
+			vector<vector<int>>result(LY,vector<int>());
+			for(int k=0;k<LY;k++)
+			{
+				for(int l=0;l<stes.size();l++)
+				{
+					cout<<"in it "<<endl;
+					int tnode=-1;
+					int tv=WD+1;
+					vector<int>dist(pnodesize,INT_MAX);
+					vector<int>pre(pnodesize,-1);
+					int vflag=1;
+					priority_queue<pair<int, int>,vector<pair<int,int>>,std::less<std::pair<int, int>>>que;
+					//queue<pair<int,int>>que;
+					int s=stes[l].first;
+					int t=stes[l].second;
+					que.push(make_pair(s,0));
+					dist[s]=0;
+					while(!que.empty()&&vflag)
+					{
+						int node=que.top().first;
+						int v=que.top().second;
+						que.pop();
+						for(int i=0;i<nein[k][node].size();i++)
+						{
+							if(neie[k][node][i]>0)
+							{	
+								int to=nein[k][node][i];
+								if(dist[to]>dist[node]+1)
+								{
+									pre[to]=node;
+									dist[to]=dist[node]+1;
+									que.push(make_pair(to,dist[to]));
+								}
+								else
+									continue;
+								if(to==t){tnode=to;tv=v+1;vflag=0;break;}
+							}
+						}
+					}
+					int prn=tnode;
+					int len=0;
+					if(tnode>=0)
+					{
+						int prn=tnode;
+						while(prn!=s)
+						{
+							cout<<prn<<" ";
+							prn=pre[prn];
+						}
+						cout<<prn<<" ";
+					}
+					cout<<endl;
+					result[k].push_back(tv);
+				}
+			}
+			end=clock();
+			cout<<"cpu time is: "<<end-start<<endl;
+			cout<<"good sofor"<<endl;
+			return vector<vector<int>>();
+        		/*cout<<"in rout alg"<<endl;
         		time_t start,end;
         		start=clock();
         		vector<vector<int>>result(LY,vector<int>());
@@ -123,15 +185,15 @@ class dijkstor:public algbase{
         				vector<int>visited(pnodesize,0);
         				vector<int>pre(pnodesize,-1);
         				int vflag=1;
-        				queue<pair<int,int>>que;
+        				priority_queue<pair<int, int>,vector<pair<int,int>>,std::less<std::pair<int, int>>>que;
         				int s=stes[l].first;
         				int t=stes[l].second;
         				que.push(make_pair(s,0));
         	        	visited[s]=1;
         				while(!que.empty()&&vflag)
         				{
-        					int node=que.front().first;
-        					int v=que.front().second;
+        					int node=que.top().first;
+        					int v=que.top().second;
         					if(v>=WD)break;
         					que.pop();
         					for(int i=0;i<nein[k][node].size();i++)
@@ -174,8 +236,8 @@ class dijkstor:public algbase{
         					cout<<result[i][j]<<" ";
         				cout<<endl;
         			}*/
-        		cout<<"cpu time is: "<<end-start<<endl;
-        		return result;
+        		/*cout<<"cpu time is: "<<end-start<<endl;
+        		return result;*/
 	 	}
         static bool compare(pair<int,int>&a,pair<int,int>&b)
         {

@@ -183,8 +183,8 @@ class Graph
             	while(t==i)t=rand()%n;
             	stpair.push_back(make_pair(i,t));
             }
-            //stpair.push_back(make_pair(3,6));
-            //stpair.push_back(make_pair(0,6));
+            stpair.push_back(make_pair(0,10));
+            stpair.push_back(make_pair(2,10));
             cout<<"stpair size is "<<stpair.size()<<endl;
             router1.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
             router2.init(make_pair(redges,esigns),stpair,erelate,ginfo(maxedge+1,edges.size(),n,maxnode+1,etn2n));
